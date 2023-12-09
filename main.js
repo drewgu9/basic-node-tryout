@@ -1,30 +1,36 @@
 const https = require("node:http");
 const fs = require("node:fs");
 
-const server = https.createServer((req, res) => {
-  console.log("hi");
-  let url;
-  console.log((url = req.url));
-  console.log(req.headers.host);
+const listOfCSSDocs = [];
+const listOfHTMLDocs = ["/about", "/contact-me", "/index"];
+const listOfJSDocs = [];
 
-  if (url == "/favicon.ico") {
-    console.log("im in your desired spot!");
-    fs.readFile("./trollface.png", "utf8", (err, data) => {
+const server = https.createServer((req, res) => {
+  let editedURL = req.url == "/" ? "/index" : req.url;
+
+  console.log("Made a query. URL: " + editedURL);
+  console.log("Full URL is " + req.headers.host);
+
+  if (listOfHTMLDocs.includes(editedURL)) {
+    console.log(
+      "Following URL: " + editedURL + " entered HTML Document return state."
+    );
+    let localPath = "./pages" + editedURL + ".html";
+    fs.readFile(localPath, (err, data) => {
       if (err) {
-        console.error(err);
-        res.writeHead(404, "HI, random failure string");
-        res.end();
-      } else {
-        console.log(data);
-        res.writeHead(200, { "Content-Type": "image/png" });
-        res.write(data);
-        res.end();
+        throw err;
       }
+
+      res.writeHead(200, { "Content-Type": "text/html" });
+      res.write(data);
+      res.end();
     });
+  } else if (listOfCSSDocs.includes(editedURL)) {
+  } else if (listOfJSDocs.includes(editedURL)) {
   } else {
-    console.log("Im not in your favicon.cio spot! and url is" + url);
-    res.writeHead(200, { "Content-Type": "text/html" });
-    res.write("<html></html>");
+    console.log("Following URL: " + editedURL + " entered 404 failure state.");
+    res.writeHead(404, { "Content-Type": "text/plain" });
+    res.write("404 Not Found\n");
     res.end();
   }
 });

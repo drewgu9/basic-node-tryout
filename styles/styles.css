@@ -1,0 +1,7 @@
+:root {
+  --best-color: red;
+}
+
+body {
+  background-color: var(--best-color);
+}
